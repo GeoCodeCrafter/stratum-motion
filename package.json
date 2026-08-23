@@ -54,7 +54,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "lint": "tsc --noEmit",
-    "demo:build": "tsup --config tsup.demo.config.ts",
+    "demo:build": "tsup --config tsup.demo.config.ts && node examples/demo/dist/prerender.js",
     "demo": "npm run demo:build && node examples/demo/serve.mjs"
   },
   "peerDependencies": {

@@ -11,3 +11,4 @@ blob-report/
 .playwright/
 *.local
 examples/demo/dist/
+examples/demo/index.html
