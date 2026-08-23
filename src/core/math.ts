@@ -1,7 +1,10 @@
 /** Constrain `value` to the inclusive range [`min`, `max`]. */
 export function clamp(value: number, min = 0, max = 1): number {
   if (min > max) throw new RangeError(`clamp: min (${min}) is greater than max (${max})`);
-  return value < min ? min : value > max ? max : value;
+  const constrained = value < min ? min : value > max ? max : value;
+  // `+ 0` collapses -0 to 0. Both compare equal, but -0 leaks into snapshot
+  // and Object.is comparisons as a phantom difference.
+  return constrained + 0;
 }
 
 /** Linear interpolation between `a` and `b` at position `t`. */
