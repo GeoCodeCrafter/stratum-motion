@@ -1,5 +1,3 @@
-import { vi } from 'vitest';
-
 type Callback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => void;
 
 interface Instance {
@@ -89,7 +87,13 @@ export function mockIntersectionObserver() {
     leave: () => fire(false, 0),
     restore: () => {
       instances.length = 0;
-      vi.unstubAllGlobals();
+      for (const target of [window, globalThis]) {
+        Object.defineProperty(target, 'IntersectionObserver', {
+          value: undefined,
+          writable: true,
+          configurable: true,
+        });
+      }
     },
   };
 }
