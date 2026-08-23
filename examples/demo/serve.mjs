@@ -1,9 +1,12 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = new URL('.', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
-const port = Number(process.env.PORT ?? 4173);
+// fileURLToPath, not URL.pathname: a path containing a space arrives
+// percent-encoded otherwise, and Windows drive letters gain a leading slash.
+const root = fileURLToPath(new URL('.', import.meta.url));
+const port = Number(process.env.PORT ?? 4319);
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
