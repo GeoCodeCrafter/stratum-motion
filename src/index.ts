@@ -41,7 +41,13 @@ export {
 } from './presets';
 
 // Lower-level building blocks, for anyone composing their own primitives
-export { animateState, setState, type AnimateOptions, type AnimationHandle } from './core/animate';
+export {
+  animateState,
+  setState,
+  clearState,
+  type AnimateOptions,
+  type AnimationHandle,
+} from './core/animate';
 export { toKeyframe, toStyle, mergeStates, type MotionState, type Keyframe } from './core/state';
 export { buildTransform, isIdentity, type TransformParts } from './core/transform';
 export { resolveEasing, easingNames, type Easing, type EasingName } from './core/easing';
@@ -63,6 +69,7 @@ export {
   LayoutShiftError,
   type CompositedProperty,
 } from './core/composited';
+export { resolvePreference, type PreferenceInputs } from './core/preference';
 export {
   prefersReducedMotion,
   subscribeReducedMotion,
