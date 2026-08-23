@@ -29,7 +29,12 @@ export function staggerDelays(count: number, step: number, from: StaggerFrom = '
     }
   };
 
-  return indices.map((index) => Math.round(distance(index) * step));
+  const distances = indices.map(distance);
+  // Normalise so someone always starts at zero. An even-numbered `center`
+  // group would otherwise open with half a step of dead time before anything
+  // moves, which reads as lag rather than as choreography.
+  const earliest = Math.min(...distances);
+  return distances.map((value) => Math.round((value - earliest) * step));
 }
 
 /** Total time from the first child starting to the last one starting. */
