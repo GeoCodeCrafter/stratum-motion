@@ -13,6 +13,11 @@ describe('clamp', () => {
     expect(clamp(5, 10, 20)).toBe(10);
   });
 
+  it('collapses negative zero, which otherwise leaks into comparisons', () => {
+    expect(Object.is(clamp(-0), 0)).toBe(true);
+    expect(Object.is(clamp(-0.5), 0)).toBe(true);
+  });
+
   it('rejects an inverted range rather than returning nonsense', () => {
     expect(() => clamp(1, 10, 0)).toThrow(RangeError);
   });
