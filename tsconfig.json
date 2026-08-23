@@ -19,7 +19,7 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "node"]
   },
   "include": ["src", "tests", "e2e", "*.config.ts"],
   "exclude": ["node_modules", "dist", "examples"]

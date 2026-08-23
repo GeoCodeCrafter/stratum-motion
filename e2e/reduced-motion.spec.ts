@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('prefers-reduced-motion: reduce', () => {
-  test.use({ reducedMotion: 'reduce' });
+  // emulateMedia rather than a `use` option, so the emulation is applied by
+  // the same API the CLS spec uses and there is one way to do it.
+  test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+  });
 
   test('still shows every reveal', async ({ page }) => {
     await page.goto('/');
@@ -51,7 +55,9 @@ test.describe('prefers-reduced-motion: reduce', () => {
 });
 
 test.describe('with motion allowed', () => {
-  test.use({ reducedMotion: 'no-preference' });
+  test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+  });
 
   test('parallax layers do move', async ({ page }) => {
     await page.goto('/');
