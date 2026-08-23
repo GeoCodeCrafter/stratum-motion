@@ -10,3 +10,4 @@ playwright-report/
 blob-report/
 .playwright/
 *.local
+examples/demo/dist/

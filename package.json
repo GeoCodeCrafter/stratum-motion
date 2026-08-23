@@ -53,7 +53,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "demo:build": "tsup --config tsup.demo.config.ts",
+    "demo": "npm run demo:build && node examples/demo/serve.mjs"
   },
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0"
