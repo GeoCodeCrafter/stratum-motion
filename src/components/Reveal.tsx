@@ -1,16 +1,17 @@
 import {
   createElement,
   useCallback,
-  useMemo,
   useRef,
   useState,
   type CSSProperties,
   type ElementType,
   type ReactNode,
 } from 'react';
-import { animateState, setState } from '../core/animate';
+import { animateState, clearState, setState } from '../core/animate';
 import { useIsomorphicLayoutEffect } from '../core/env';
 import type { Easing } from '../core/easing';
+import { prefersReducedMotion } from '../core/reduced-motion';
+import { resolvePreference } from '../core/preference';
 import {
   resolveTransition,
   toReducedTransition,
@@ -77,29 +78,39 @@ export function Reveal({
   const reduced = useReducedMotion();
   const staggerDelay = useStaggerDelay();
   const [revealed, setRevealed] = useState(false);
-  const primed = useRef(false);
 
-  const transition = useMemo<Transition>(() => {
+  /**
+   * Resolved inside the effects, and from a live media query rather than from
+   * the store. `useSyncExternalStore` reports the server snapshot until
+   * hydration finishes, and priming an element from that stale value puts a
+   * transform on screen for someone who asked for no movement at all.
+   */
+  const plan = useCallback(() => {
+    const isReduced = resolvePreference(config, prefersReducedMotion());
     const base = resolveTransition(preset, { distance, scaleFrom, blur });
-    return reduced ? toReducedTransition(base) : base;
-  }, [preset, distance, scaleFrom, blur, reduced]);
+    const requested = duration ?? config.defaultDuration;
+    const scaled = isReduced ? Math.min(requested, REDUCED_DURATION) : requested;
 
-  const timing = useMemo(() => {
-    const base = duration ?? config.defaultDuration;
     return {
-      duration: config.disabled ? 0 : Math.round((reduced ? Math.min(base, REDUCED_DURATION) : base) * config.durationScale),
-      delay: config.disabled ? 0 : Math.round((delay + staggerDelay) * config.durationScale),
-      easing: easing ?? config.defaultEasing,
+      transition: isReduced ? toReducedTransition(base) : base,
+      timing: {
+        duration: config.disabled ? 0 : Math.round(scaled * config.durationScale),
+        delay: config.disabled ? 0 : Math.round((delay + staggerDelay) * config.durationScale),
+        easing: easing ?? config.defaultEasing,
+      },
     };
-  }, [duration, delay, easing, staggerDelay, config, reduced]);
+  }, [config, preset, distance, scaleFrom, blur, duration, delay, staggerDelay, easing]);
 
   // Apply the hidden state before first paint, never during SSR.
   useIsomorphicLayoutEffect(() => {
     const element = ref.current;
-    if (!element || config.disabled || primed.current || revealed) return;
-    primed.current = true;
-    setState(element, transition.from);
-  }, [config.disabled, transition, revealed]);
+    if (!element || config.disabled || revealed) return;
+
+    // Clear first: switching to the reduced transition mid-life leaves no
+    // keyframe to overwrite a transform the previous one wrote.
+    clearState(element);
+    setState(element, plan().transition.from);
+  }, [config.disabled, plan, revealed, reduced]);
 
   const inView = useInView(ref, { once, amount, rootMargin, skip: config.disabled });
 
@@ -112,7 +123,10 @@ export function Reveal({
     const element = ref.current;
     if (!element) return;
 
+    const { transition, timing } = plan();
+
     if (config.disabled) {
+      clearState(element);
       setState(element, transition.to);
       handleRevealed();
       return;
@@ -120,6 +134,7 @@ export function Reveal({
 
     if (!inView) {
       if (!once && revealed) {
+        clearState(element);
         setState(element, transition.from);
         setRevealed(false);
       }
@@ -138,7 +153,7 @@ export function Reveal({
     // `revealed` is deliberately absent: re-running on our own state change
     // would restart the animation the moment it finished.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, once, transition, timing, config.disabled, handleRevealed]);
+  }, [inView, once, plan, config.disabled, handleRevealed, reduced]);
 
   return createElement(
     as,
