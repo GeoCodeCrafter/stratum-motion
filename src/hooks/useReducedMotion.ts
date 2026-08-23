@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { prefersReducedMotion, subscribeReducedMotion } from '../core/reduced-motion';
 import { useMotionConfig } from '../context/MotionConfigContext';
+import { resolvePreference } from '../core/preference';
 
 function subscribe(onChange: () => void): () => void {
   return subscribeReducedMotion(() => onChange());
@@ -25,11 +26,5 @@ export function useSystemReducedMotion(): boolean {
  * a `MotionConfig` above it says otherwise.
  */
 export function useReducedMotion(): boolean {
-  const system = useSystemReducedMotion();
-  const { reducedMotion, disabled } = useMotionConfig();
-
-  if (disabled) return true;
-  if (reducedMotion === 'reduce') return true;
-  if (reducedMotion === 'no-preference') return false;
-  return system;
+  return resolvePreference(useMotionConfig(), useSystemReducedMotion());
 }

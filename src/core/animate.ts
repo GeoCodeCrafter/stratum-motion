@@ -75,6 +75,19 @@ export function animateState(
   };
 }
 
+/**
+ * Remove every inline property this library writes.
+ *
+ * Needed whenever the transition itself changes - switching to the reduced
+ * variant leaves no keyframe to overwrite a transform written by the previous
+ * one, so it has to be cleared rather than animated away.
+ */
+export function clearState(element: HTMLElement): void {
+  element.style.opacity = '';
+  element.style.transform = '';
+  element.style.filter = '';
+}
+
 /** Snap an element to a state with no transition at all. */
 export function setState(element: HTMLElement, state: MotionState): void {
   applyState(element, state);
