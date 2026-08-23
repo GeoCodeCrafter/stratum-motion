@@ -78,6 +78,33 @@ describe('hydration', () => {
     restore();
   });
 
+  it('primes without a transform for a reduced-motion user', () => {
+    // Regression: useSyncExternalStore reports the *server* snapshot until
+    // hydration finishes, so a reveal primed from it applied the full moving
+    // hidden state - and the reduced keyframes had no transform to undo it,
+    // leaving the element permanently displaced.
+    media.set(true);
+    const { container, restore } = hydrate(<Reveal preset="rise">Hello</Reveal>);
+    const element = container.firstElementChild as HTMLElement;
+
+    expect(element.style.opacity).toBe('0');
+    expect(element.style.transform).toBe('');
+    restore();
+  });
+
+  it('clears a stale transform when the preference flips after mount', async () => {
+    const { container, restore } = hydrate(<Reveal preset="rise">Hello</Reveal>);
+    const element = container.firstElementChild as HTMLElement;
+    expect(element.style.transform).toContain('translate3d');
+
+    await act(async () => {
+      media.set(true);
+    });
+
+    expect(element.style.transform).toBe('');
+    restore();
+  });
+
   it('reveals normally once hydrated', async () => {
     const { container, warnings, restore } = hydrate(<Reveal>Hello</Reveal>);
     const element = container.firstElementChild as HTMLElement;
