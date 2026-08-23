@@ -21,12 +21,15 @@ test.describe('Reveal', () => {
     await expect(card).toHaveAttribute('data-stratum-state', 'revealed');
   });
 
-  test('reveals a staggered group in order', async ({ page }) => {
+  test('reveals every card in a staggered group', async ({ page }) => {
     await page.goto('/');
-    await page.getByTestId('preset-fade').scrollIntoViewIfNeeded();
 
+    // The grid wraps, so the last card can still be below the fold once the
+    // first one is visible. Scroll to each in turn rather than assuming.
     for (const name of ['fade', 'fadeUp', 'rise', 'tilt']) {
-      await expect(page.getByTestId(`preset-${name}`)).toHaveCSS('opacity', '1');
+      const card = page.getByTestId(`preset-${name}`);
+      await card.scrollIntoViewIfNeeded();
+      await expect(card).toHaveCSS('opacity', '1');
     }
   });
 
