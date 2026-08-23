@@ -35,7 +35,8 @@ export function mapRange(
 /** Round to a fixed number of decimals, avoiding 0.30000000000000004 in styles. */
 export function round(value: number, decimals = 3): number {
   const factor = 10 ** decimals;
-  return Math.round(value * factor) / factor;
+  // `+ 0` for the same reason as clamp: -0 has no place in a style string.
+  return Math.round(value * factor) / factor + 0;
 }
 
 /** Distance in pixels, used by the parallax offset maths. */

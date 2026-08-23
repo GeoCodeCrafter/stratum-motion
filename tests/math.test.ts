@@ -60,6 +60,7 @@ describe('round', () => {
   it('keeps floating point noise out of style strings', () => {
     expect(round(0.1 + 0.2)).toBe(0.3);
     expect(round(1.23456, 2)).toBe(1.23);
+    expect(Object.is(round(-0.0001), 0)).toBe(true);
   });
 });
 
