@@ -6,6 +6,10 @@
 Scroll reveals, parallax, scroll-driven scenes and page transitions for React —
 server-safe, dependency-free, and incapable of shifting your layout.
 
+**[Try it →](https://geocodecrafter.github.io/stratum-motion/)**
+
+![Scrolling the demo: sections reveal as they enter the viewport, parallax layers drift, and nothing below the fold moves anything above it](docs/demo.gif)
+
 ```tsx
 <Reveal preset="fadeUp">
   <h1>Renders visible on the server. Animates on the client.</h1>
@@ -249,6 +253,22 @@ Anything with IntersectionObserver and the Web Animations API — Chrome 84+,
 Firefox 75+, Safari 13.1+. Without WAAPI, elements snap to their final state;
 without IntersectionObserver, they render visible immediately. Both fallbacks
 lose the animation and keep the content.
+
+## The GIF above
+
+Generated rather than screen-recorded:
+
+```bash
+npm run demo &
+npm run demo:gif
+```
+
+Playwright scrolls the demo and `gifenc` encodes the frames. Playwright bundles
+an ffmpeg, but it's a stripped webm-only build with no GIF muxer.
+
+The one thing that matters in that script is waiting ~90ms after each scroll
+step before screenshotting. Without it every element is caught at frame zero of
+its own reveal, and you get a GIF of a motion library that appears to do nothing.
 
 ## Licence
 

@@ -12,3 +12,4 @@ blob-report/
 *.local
 examples/demo/dist/
 examples/demo/index.html
+dist-demo/
